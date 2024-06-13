@@ -20,34 +20,20 @@ public_users.post("/register", (req, res) => {
 });
 
 // Get the book list available in the shop
-public_users.get('/',function (req, res) {
+public_users.get('/', async function (req, res) {
   //Write your code here
   //return res.send(JSON.stringify(books, null, 4));
   async function getBooks() {
     return books;
   }
-  getBooks().then((result) => res.json(result));
+  return getBooks()
+  .then((result) => res.json(result))
+  .catch((err) => res.status(404).send({message: "Failed to get books database, err: " + err.toString()}));
 });
-
-function getBooksByKeyValue(key, value) {
-  return new Promise((resolve, reject) => {
-    var out = [];
-    for (const [idx_, info_] of Object.entries(books)) {
-      if (info_[key] == value) {
-        out.push(info_);
-      }
-    }
-    if (out.length > 0) {
-      resolve(out);
-    } else {
-      reject(`Unknown ${key}='${value}'`);
-    }
-  });
-}
 
 
 // Get book details based on ISBN
-public_users.get('/isbn/:isbn',function (req, res) {
+public_users.get('/isbn/:isbn', async function (req, res) {
   //Write your code here 
   const prom = new Promise((resolve, reject) => {
     const isbn = req.params.isbn;
@@ -70,9 +56,26 @@ public_users.get('/isbn/:isbn',function (req, res) {
   }
   */
  });
+
+
+async function getBooksByKeyValue(key, value) {
+  return new Promise((resolve, reject) => {
+    var out = [];
+    for (const [isbn_, info_] of Object.entries(books)) {
+      if (info_[key] == value) {
+        out.push(info_);
+      }
+    }
+    if (out.length > 0) {
+      resolve(out);
+    } else {
+      reject(`Unknown ${key}='${value}'`);
+    }
+  });
+}
   
 // Get book details based on author
-public_users.get('/author/:author',function (req, res) {
+public_users.get('/author/:author', async function (req, res) {
   return getBooksByKeyValue("author", req.params.author)
   .then((value) => res.send(value))
   .catch((err) => res.status(404).send({message: err.toString()}))
@@ -108,7 +111,7 @@ public_users.get('/title/:title',function (req, res) {
 });
 
 //  Get book review
-public_users.get('/review/:isbn',function (req, res) {
+public_users.get('/review/:isbn', function (req, res) {
   //Write your code here
   const isbn = req.params.isbn;
   const info = books[isbn];
