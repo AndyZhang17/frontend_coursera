@@ -23,11 +23,10 @@ public_users.post("/register", (req, res) => {
 public_users.get('/',function (req, res) {
   //Write your code here
   //return res.send(JSON.stringify(books, null, 4));
-  const prom = new Promise((resolve, reject) => {
-    console.log("Waiting for database response ...");
-    resolve(books);
-  });
-  prom.then((result) => res.json(result));
+  async function getBooks() {
+    return books;
+  }
+  getBooks().then((result) => res.json(result));
 });
 
 function getBooksByKeyValue(key, value) {
